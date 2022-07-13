@@ -11,11 +11,11 @@ const useStorageState = (key, initialState) => {
 }
 
 const App = () => {
-  const stories = [
+  const initialStories = [
     {
       title: 'React',
       url: 'https://reactjs.org/',
-      author: 'Jordan Walke',
+      author: ' Jordan Walke ',
       num_comments: 3,
       points: 4,
       objectID: 0,
@@ -23,7 +23,7 @@ const App = () => {
     {
       title: 'Redux',
       url: 'https://redux.js.org/',
-      author: 'Dan Abramov, Andrew Clark',
+      author: ' Dan Abramov, Andrew Clark ',
       num_comments: 2,
       points: 5,
       objectID: 1,
@@ -31,14 +31,23 @@ const App = () => {
     {
       title: 'ß',
       url: 'https://en.wikipedia.org/wiki/%C3%9F',
-      author: 'I made this up ngl',
+      author: ' I made this up ngl ',
       num_comments: 444,
       points: 7,
       objectID: 2,
     },
   ];
 
-  const [searchTerm, setSearchTerm] = useStorageState('search', 'ß');
+  const [searchTerm, setSearchTerm] = useStorageState('search', '');
+  const [stories, setStories] = React.useState(initialStories);
+
+  const handleRemoveStory = (item) => {
+    const newStories = stories.filter(
+      (story) => item.objectID !== story.objectID
+    );
+
+    setStories(newStories);
+  };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -52,42 +61,59 @@ const App = () => {
     <div>
       <h1>Search Frameworks</h1>
 
-      <InputWithLabel id='search' label='Search' onInputChange={handleSearch} value={searchTerm} />
+      <InputWithLabel id='search' label='Search' isFocused onInputChange={handleSearch} value={searchTerm}>
+        <strong>Search:</strong>
+      </InputWithLabel>
 
       <hr />
 
-      <List list={searchedStories} />
+      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
     </div>
   );
 }
 
-const InputWithLabel = ({ id, label, value, onInputChange }) => (
-  <>
-    <label htmlFor={id}>{label}</label>
-    &nbsp;&nbsp;
-    <input id={id} type='text' value={value} onChange={onInputChange} />
+const InputWithLabel = ({ id, value, onInputChange, isFocused, children }) => {
+  const inputRef = React.useRef();
 
-    <p>
-      Searching for <strong>{value}</strong>
-    </p>
-  </>
-);
+  React.useEffect(() => {
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isFocused]);
+  return (
+    <>
+      <label htmlFor={id}>{children}</label>
+      &nbsp;&nbsp;
+      <input ref={inputRef} id={id} type='text' value={value} autoFocus={isFocused} onChange={onInputChange} />
 
-const Item = ({ item }) => (
-  <li>
+      <p>
+        Searching for <strong>{value}</strong>
+      </p>
+    </>)
+};
+
+const Item = ({ item, onRemoveItem }) => {
+  // const handleRemoveItem = () => {
+  //   onRemoveItem(item);
+  // };
+
+  return (<li>
     <span>
       <a href={item.url}>{item.title}</a>
     </span>
     <span>{item.author}</span>
     <span>{item.num_comments}</span>
     <span>{item.points}</span>
-  </li>
-);
+    <span>
+      <button type='button' onClick={() => onRemoveItem(item)}>Dismiss</button>
+    </span>
+  </li>);
+};
 
-const List = ({ list }) => (
+const List = ({ list, onRemoveItem }) => (
   <ul>
     {list.map((item) => (
-      <Item key={item.objectID} item={item} />
+      <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
     ))}
   </ul>
 );
