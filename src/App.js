@@ -1,7 +1,7 @@
 import * as React from 'react';
 import axios from 'axios';
 
-import './App.css';
+import styles from './App.module.css';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -100,8 +100,8 @@ const App = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className='headline-primary'>Dev Articles/Stories Lookup</h1>
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>Dev Articles/Stories Lookup</h1>
 
       <SearchForm
         searchTerm={searchTerm}
@@ -171,7 +171,7 @@ const List = ({ list, onRemoveItem }) => (
 );
 
 const Item = ({ item, onRemoveItem }) => (
-  <li className="item">
+  <li className={styles.item}>
     <span style={{ width: '40%' }}>
       <a target='_blank' href={item.url}>{item.title}</a>
     </span>
